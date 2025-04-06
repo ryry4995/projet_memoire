@@ -8,4 +8,5 @@ urlpatterns = [
     path('supprimer/<int:pk>/', supprimer_reception, name='supprimer_reception'),
     path("modifier/<int:reception_id>/", modifier_quantite_reception, name="modifier_quantite_reception"),
 
+
 ]

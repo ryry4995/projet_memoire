@@ -3,7 +3,7 @@ from django.http import JsonResponse  # type: ignore
 from .models import Reception
 from stock.models import Stock
 import json
-
+from urllib.parse import unquote
 
 def modifier_quantite_reception(request, reception_id):
     print(f"🔹 Requête reçue pour modifier la réception {reception_id}")
@@ -12,6 +12,8 @@ def modifier_quantite_reception(request, reception_id):
         try:
             # Charger les données JSON envoyées
             data = json.loads(request.body)
+            print(f"🔹 Données reçues : {data}")  # Log pour vérifier les données reçues
+
             nouvelle_quantite = data.get("quantite_receptionnee")
 
             # Conversion explicite de la quantité en entier si nécessaire
@@ -35,7 +37,7 @@ def modifier_quantite_reception(request, reception_id):
             reception.quantite_receptionnee += nouvelle_quantite
             reception.save()
 
-            print(f"✅ Quantité mise à jour avec succès !")
+            print(f"✅ Quantité mise à jour avec succès ! Quantité totale : {reception.quantite_receptionnee}")
             return JsonResponse({"success": True})
 
         except Exception as e:
@@ -47,22 +49,53 @@ def modifier_quantite_reception(request, reception_id):
 
 
 
-def change_statut_reception(request, pk, statut):
-    # Récupérer la réception correspondant à l'ID
-    reception = get_object_or_404(Reception, pk=pk)
-    
-    # Mettre à jour le statut de la réception
-    reception.statut = statut
-    reception.save()
 
-    # Vérifier si le statut est "Réceptionné"
-    if statut == "Réceptionné":
-        # Rediriger vers la vue de stock (ajuster l'URL selon ta configuration)
-        return redirect('stock:stock_list')  # Remplace 'stock:stock_list' par le nom de l'URL de la vue stock
-    else:
-        # Sinon, rediriger vers la liste des réceptions
+def change_statut_reception(request, pk, statut):
+    try:
+        # Décoder l'URL pour éviter des problèmes avec les caractères spéciaux
+        statut = unquote(statut)
+        
+        reception = get_object_or_404(Reception, pk=pk)
+
+        if reception.quantite_receptionnee is None:
+            reception.quantite_receptionnee = 0
+
+        reception.statut = statut
+        reception.save()
+
+        if statut == "Réceptionné":
+            nouvelle_quantite = reception.quantite_receptionnee
+
+            if nouvelle_quantite <= 0:
+                return JsonResponse({"success": False, "error": "Quantité réceptionnée invalide"}, status=400)
+
+            quantite_unitaire = reception.quantite_unitaire
+            if quantite_unitaire is None or quantite_unitaire <= 0:
+                return JsonResponse({"success": False, "error": "Quantité unitaire invalide"}, status=400)
+
+            # Calculer le stock total en prenant en compte toutes les réceptions précédentes
+            receptions = Reception.objects.filter(code_article=reception.code_article, statut="Réceptionné")
+            stock_total_ajoute = sum(
+                r.quantite_receptionnee * r.quantite_unitaire
+                for r in receptions
+                if r.quantite_receptionnee and r.quantite_unitaire
+            )
+
+            # Récupérer ou créer le stock
+            stock, created = Stock.objects.get_or_create(code_article=reception.code_article)
+
+            # Mettre à jour le stock total en fonction des réceptions
+            stock.stock_total = stock_total_ajoute
+            stock.save()
+
+            print("✅ Stock mis à jour avec succès.")
+            return redirect('stock:stock_list')
+
         return redirect('reception:reception_list')
- # Redirige vers la liste des réceptions
+
+    except Exception as e:
+        print(f"❌ Erreur: {str(e)}")
+        return JsonResponse({"success": False, "error": str(e)}, status=500)
 
 def reception_detail(request, pk):
     reception = get_object_or_404(Reception, pk=pk)

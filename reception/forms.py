@@ -12,3 +12,4 @@ class ModifierQuantiteReceptionForm(forms.ModelForm):
         labels = {
             "quantite_receptionnee": "Quantité réceptionnée"
         }
+

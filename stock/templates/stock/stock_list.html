@@ -128,11 +128,9 @@
                     <td>
                         {% if stock.code_article %}
                             <a href="{% url 'stock:stock_detail' stock.code_article %}" class="btn btn-info btn-sm">
-                                <i class="fas fa-eye"></i> Voir
+                                <i class="fas fa-eye"></i> Modifier
                             </a>
-                            <a href="{% url 'stock:stock_update' stock.code_article %}" class="btn btn-warning btn-sm">
-                                <i class="fas fa-edit"></i> Modifier
-                            </a>
+                            
                             <button class="btn btn-danger btn-sm delete-btn" data-code="{{ stock.code_article }}">
                                 <i class="fas fa-trash-alt"></i> Supprimer
                             </button>

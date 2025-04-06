@@ -4,7 +4,7 @@ from article.models import Article
 from reception.models import Reception
 class Stock(models.Model):
     id_stock = models.AutoField(primary_key=True)
-    code_article = models.CharField(max_length=50, unique=True)  # Code article unique
+    code_article = models.CharField(max_length=50)  
     designation = models.CharField(max_length=255)  # Nom de l'article
     unite = models.CharField(max_length=50, blank=True, null=True)  # Unité de mesure
     quantite_demandee = models.IntegerField(default=0)  # Quantité demandée
@@ -43,3 +43,11 @@ class Stock(models.Model):
 
     def __str__(self):
         return f"{self.designation} ({self.code_article})"
+# Voir toutes les réceptions pour un article spécifique
+receptions = Reception.objects.filter(code_article='ACT1000')
+for reception in receptions:
+    print(reception.quantite_receptionnee, reception.quantite_unitaire)
+
+# Voir le stock pour cet article
+stock = Stock.objects.get(code_article='ACT1000')
+print(stock.stock_total, stock.stock_consomer)
