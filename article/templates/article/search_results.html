@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Résultats de recherche{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h2>Résultats pour "{{ query }}"</h2>
+    {% if results %}
+        <ul>
+            {% for article in results %}
+                <li>
+                    <a href="{% url 'article:article_detail' pk=article.pk %}">
+                        {{ article.code_article }} - {{ article.designation }}
+                    </a>
+                    <p>Catégorie : {{ article.categorie }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aucun résultat trouvé.</p>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Ajouter stock_consomer</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            {{ form.as_p }}  <!-- Affiche le formulaire avec des balises <p> -->
+        </div>
+        <button type="submit" class="btn btn-success">Ajouter</button>
+        <a href="{% url 'stock:stock_list' %}" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>
+{% endblock %}

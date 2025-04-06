@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Réceptions - Gestion de Stock</title>
+    {% load static %}
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    
+    <!-- Styles personnalisés -->
+    <style>
+        /* Arrière-plan avec image */
+        body {
+            background: url("{% static 'images/backgroun.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Style du conteneur */
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+    
+        h1 {
+            background: linear-gradient(90deg, #ff8c00, #ff0080);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #007bff, #00c6ff);
+            border: none;
+            transition: 0.3s ease-in-out;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #0056b3, #0084ff);
+            transform: scale(1.05);
+        }
+
+        thead {
+            background: linear-gradient(45deg, #343a40, #495057);
+            color: white;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+
+        .badge.bg-warning {
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container mt-4">
+    <h1 class="text-center text-uppercase">📦 Liste des Réceptions</h1>
+
+    <div class="mb-3">
+        <a href="{% url 'article:home_view' %}" class="btn btn-primary">
+            <i class="fas fa-home"></i> Accueil
+        </a>
+        
+    </div>
+
+    <div class="table-responsive shadow-lg rounded p-4 bg-light">
+        <table class="table table-bordered table-striped text-center">
+            <thead>
+                <tr>
+                    <th>ID Réception</th>
+                    <th>Commande</th>
+                    <th>Article</th>
+                    <th>Quantité Demandée</th>
+                    <th>Quantité Réceptionnée</th>
+                    <th>Quantité Unitaire</th>
+                    <th>Unité</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if receptions %}
+                    {% for reception in receptions %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'reception:reception_detail' reception.id_reception %}" 
+                                   class="fw-bold text-decoration-none text-primary">
+                                    <i class="fas fa-box"></i> {{ reception.id_reception }}
+                                </a>
+                            </td>
+                            <td>{{ reception.code_article }}</td>
+                            <td>{{ reception.designation }}</td>
+                            <td><strong>{{ reception.quantite_demandee }}</strong></td>
+                            <td>{{ reception.quantite_receptionnee }}</td>
+                            <td>{{ reception.id_article.quantite_unitaire|default:"-" }}</td>
+                            
+                            <td><strong>{{ reception.unite }}</strong></td>
+                            <td>
+                                <span class="badge rounded-pill px-3 py-2 
+                                    {% if reception.statut == 'Réceptionné' %} bg-success
+                                    {% else %} bg-warning text-dark{% endif %}">
+                                    <i class="fas 
+                                        {% if reception.statut == 'Réceptionné' %} fa-check-circle 
+                                        {% else %} fa-hourglass-half {% endif %}"></i> 
+                                    {{ reception.statut|default:"Non réceptionné" }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if reception.statut == "Non réceptionné" %}
+                                    
+                                {% else %}
+                                    <span class="text-muted fw-semibold">
+                                        <i class="fas fa-ban"></i> Aucune action
+                                    </span>
+                                {% endif %}
+
+                                <a href="{% url 'reception:supprimer_reception' reception.id_reception %}" 
+                                   class="btn btn-outline-danger btn-sm mx-1 shadow-sm"
+                                   onclick="return confirm('Voulez-vous vraiment supprimer cette réception ?');">
+                                    <i class="fas fa-trash-alt"></i> Supprimer
+                                </a>
+
+                                <button class="btn btn-warning btn-sm edit-quantite-btn" 
+                                data-url="{% url 'reception:modifier_quantite_reception' reception.id_reception %}" 
+                                data-quantite="{{ reception.quantite_receptionnee|default:0 }}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            </td>
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="9" class="text-center text-muted">
+                                    <i class="fas fa-box-open"></i> Aucune réception enregistrée.
+                                </td>
+                            </tr>
+                            {% endif %}
+                            </tbody>
+                            </table>
+                            </div>
+                            </div>
+                            
+                            <!-- Scripts -->
+                            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                            
+                            <script>
+                               document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".edit-quantite-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            const url = this.getAttribute("data-url");
+            const quantite = this.getAttribute("data-quantite");
+            const quantiteTd = this.closest('tr').querySelector('td:nth-child(5)');  // Sélectionne la cellule de la quantité reçue
+
+            Swal.fire({
+                title: "Modifier la quantité réceptionnée",
+                input: "number",
+                inputValue: quantite,
+                showCancelButton: true,
+                confirmButtonText: "Modifier",
+                cancelButtonText: "Annuler",
+                inputValidator: (value) => {
+                    if (!value || value <= 0) {
+                        return "Veuillez saisir une quantité valide !";
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const newQuantite = result.value;
+
+                    // Effectuer la requête vers Django avec fetch
+                    fetch(url, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": "{{ csrf_token }}"  // Assurez-vous que csrf_token est disponible dans le template
+                        },
+                        body: JSON.stringify({ quantite_receptionnee: newQuantite })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("Erreur lors de la modification");
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            // Mettre à jour la quantité dans la page sans recharger
+                            quantiteTd.textContent = newQuantite;  // Mise à jour de la cellule avec la nouvelle quantité
+                            Swal.fire("Succès", "Quantité mise à jour !", "success");
+                        } else {
+                            throw new Error(data.error);
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire("Erreur", error.message, "error");
+                    });
+                }
+            });
+        });
+    });
+});
+
+ </script>
+                            
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Confirmer la Suppression{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center text-danger"><i class="bi bi-exclamation-triangle-fill"></i> Confirmer la Suppression</h2>
+    <p class="text-center">Êtes-vous sûr de vouloir supprimer cette demande d'achat ? Cette action est <strong>irréversible</strong>.</p>
+    
+    <div class="card border-danger shadow mt-4">
+        <div class="card-body">
+            <h5 class="card-title text-danger"><i class="bi bi-info-circle"></i> Détails de la Demande d'Achat</h5>
+            <ul class="list-group">
+                <li class="list-group-item"><strong>ID :</strong> {{ demande.id_demande }}</li>
+                <li class="list-group-item"><strong>Article :</strong> {{ demande.id_article.designation|default:"Non spécifié" }}</li>
+                <li class="list-group-item"><strong>Quantité Demandée :</strong> {{ demande.quantite_demandee }}</li>
+                <li class="list-group-item"><strong>Date de la Demande :</strong> {{ demande.date_demande|date:"d/m/Y" }}</li>
+                <li class="list-group-item"><strong>Statut :</strong> {{ demande.statut|default:"Non spécifié" }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <!-- Bouton pour ouvrir le modal -->
+        <button class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+            <i class="bi bi-trash3"></i> Supprimer
+        </button>
+        <a href="{% url 'demande_achat:demande_achat_list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Annuler
+        </a>
+    </div>
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="modalLabel"><i class="bi bi-exclamation-triangle"></i> Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">Voulez-vous vraiment supprimer cette demande d'achat ? Cette action est <strong>irréversible</strong> !</p>
+            </div>
+            <div class="modal-footer d-flex justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-trash"></i> Confirmer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alerte de confirmation après suppression -->
+{% if messages %}
+    <div class="alert alert-success alert-dismissible fade show mt-4 text-center" role="alert">
+        <i class="bi bi-check-circle"></i> {{ messages }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails Réception</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+</head>
+<body>
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center text-uppercase fw-bold text-primary-emphasis">
+        📄 Détails de la Réception
+    </h2>
+
+    <div class="card shadow-lg p-4 bg-light">
+        <div class="card-body">
+            <h5 class="card-title fw-bold">ID Réception: {{ reception.id_reception }}</h5>
+            <p class="card-text"><strong>Commande:</strong> {{ reception.code_article }}</p>
+            <p class="card-text"><strong>Article:</strong> {{ reception.designation }}</p>
+            <p class="card-text"><strong>Quantité Demandée:</strong> {{ reception.quantite_demandee }}</p>
+            <a href="{% url 'reception:change_statut_reception' reception.id_reception 'Réceptionné' %}" 
+   class="btn btn-success btn-sm mx-1 shadow-sm">
+    <i class="fas fa-check"></i> Réceptionner
+</a>
+
+            <form method="post">
+                {% csrf_token %}
+                <label for="date_reception" class="form-label"><strong>Choisir une date :</strong></label>
+                <input type="date" id="date_reception" name="date_reception" class="form-control mb-3" value="{{ reception.date_reception|date:'Y-m-d' }}">
+                
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> Enregistrer la date
+                </button>
+            </form>
+            
+            <p class="card-text"><strong>Statut:</strong> 
+                <span class="badge {% if reception.statut == 'Réceptionné' %} bg-success {% else %} bg-warning text-dark{% endif %}">
+                    {{ reception.statut }}
+                </span>
+            </p>
+            
+            <!-- Bouton qui envoie une requête pour changer le statut -->
+            <a href="{% url 'reception:reception_list' %}" class="btn btn-success">
+                <i class="fas fa-check-circle"></i> Retour à la liste des reception
+            </a>
+            
+               
+            
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

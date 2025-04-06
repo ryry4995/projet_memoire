@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Détail de l'article{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <i class="fas fa-info-circle"></i> Détail de l'article
+        </div>
+        <div class="card-body">
+            <h2 class="mb-3">{{ article.designation }} <small class="text-muted">Code: {{ article.code_article }}</small></h2>
+            <p><strong>Désignation:</strong> {{ article.designation }}</p>
+            <p><strong>Catégorie:</strong> {{ article.categorie }}</p>
+            <p><strong>Unité:</strong> {{ article.unite }}</p>
+            <p><strong>Status:</strong> <span class="badge bg-{{ 'success' if article.status == 'Disponible' else 'danger' }}">{{ article.status }}</span></p>
+            <!-- Si d'autres informations sont nécessaires, vous pouvez les ajouter ici -->
+            
+            <div class="mt-4 d-flex justify-content-between">
+                <a href="{% url 'article:article_list' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                </a>
+                <a href="{% url 'article:article_edit' article.id_article %}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Modifier l'article
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ajoutez des animations et interactions pour améliorer l'expérience utilisateur -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Exemple d'animation pour les informations de l'article
+        const articleDetails = document.querySelectorAll('p, h2');
+        articleDetails.forEach(element => {
+            element.classList.add('fade-in');
+        });
+    });
+</script>
+
+<style>
+    /* Animation de fade-in pour les éléments de l'article */
+    .fade-in {
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+</style>
+
+{% endblock %}

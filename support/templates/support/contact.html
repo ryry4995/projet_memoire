@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title></title>
+    {% load static %}
+    <!-- Ajout de Bootstrap (si ce n'est pas inclus dans un fichier externe) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <style>
+        /* Arrière-plan avec image */
+        body {
+            background: url("{% static 'images/backgroun.jpg' %}") no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Style du conteneur */
+        .container {
+            background: rgba(255, 255, 255, 0);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+{% block content %}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="mb-3">
+                <a href="{% url 'article:home_view' %}" class="btn btn-primary">
+                    <i class="fas fa-home"></i> Accueil
+                </a>
+            </div>
+            <div class="card shadow-lg rounded">
+                
+                <div class="card-header bg-primary text-white text-center">
+                    <h2><i class="fas fa-envelope"></i> Contactez l'Administrateur</h2>
+                </div>
+                <div class="card-body">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <form method="post" id="contactForm">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_email" class="form-label">Email</label>
+                            <input type="email" name="email" id="id_email" class="form-control" placeholder="exemple@domaine.com" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_sujet" class="form-label">Sujet</label>
+                            <input type="text" name="sujet" id="id_sujet" class="form-control" placeholder="Ex : Problème d'accès" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_message" class="form-label">Message</label>
+                            <textarea name="message" id="id_message" class="form-control" rows="5" placeholder="Décrivez votre problème ici..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Envoyer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Ajout d'un script JS pour l'effet de chargement sur le bouton -->
+<script>
+    document.getElementById("contactForm").addEventListener("submit", function() {
+        document.getElementById("spinner").classList.remove("d-none");
+    });
+</script>
+
+{% endblock %}

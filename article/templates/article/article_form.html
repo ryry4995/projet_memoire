@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire d'Article</title>
+    <!-- Ajout des liens Bootstrap et FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="d-flex align-items-center justify-content-center vh-100 bg-light">
+
+<div class="card shadow-lg p-4" style="max-width: 600px; width: 100%;">
+    <h2 class="text-center mb-3">
+        {% if form.instance.id %}Modifier l'Article{% else %}Créer un Article{% endif %}
+    </h2>
+
+    <!-- Affichage des erreurs -->
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <ul class="mb-0">
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li><strong>{{ field.label }}</strong> : {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="post" id="articleForm">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3 row align-items-center">
+            <label for="{{ field.id_for_label }}" class="col-sm-4 col-form-label text-end fw-bold">
+                {{ field.label }}
+            </label>
+            <div class="col-sm-8">
+                {{ field }}
+                {% if field.errors %}
+                    <div class="alert alert-danger mt-1">
+                        {% for error in field.errors %}
+                            <p class="mb-0">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmModal">
+                Enregistrer
+            </button>
+            <a href="{% url 'article:article_list' %}" class="btn btn-secondary">Annuler</a>
+        </div>
+    </form>
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning text-white">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir enregistrer cet article ?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-success" id="confirmSave">Confirmer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts Bootstrap et JavaScript -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.getElementById('confirmSave').addEventListener('click', function() {
+        document.getElementById('articleForm').submit();
+    });
+</script>
+
+</body>
+</html>

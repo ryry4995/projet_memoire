@@ -1,0 +1,79 @@
+/* Réinitialiser les styles de base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Définir le style de base du corps avec un dégradé moderne */
+body {
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #e0eafc, #cfdef3);
+    color: #333;
+}
+
+/* Titres avec une couleur personnalisée */
+h1, h2, h3 {
+    color: #007bff;
+}
+
+/* Style de la barre de navigation */
+.navbar-brand {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Améliorer l'apparence de la table */
+.table th, 
+.table td {
+    vertical-align: middle;
+}
+
+/* Boutons communs */
+.btn {
+    display: inline-block;
+    visibility: visible !important;
+    color: white;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+/* Définir les couleurs spécifiques pour différents types de boutons */
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+}
+
+/* Effet sur les cartes */
+.card {
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: scale(1.05);
+}
+
+/* Ajuster les boutons avec des tailles personnalisées */
+.btn-lg {
+    border-radius: 25px;
+}
+
+/* Pied de page toujours en bas */
+footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 14px;
+}

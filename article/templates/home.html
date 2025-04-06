@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load static %}
+{% load mathfilters %}  
+
+{% block title %}Accueil - Gestion de Stock des Réactifs{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* 🌟 Styles généraux */
+    body {
+        background-color: #1e1e2f;
+        font-family: 'Poppins', sans-serif;
+        color: #ffffff;
+    }
+    
+
+    /* 🌟 Barre latérale */
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 260px;
+        background-color: #24243e;
+        padding: 20px;
+        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar .nav-link {
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: 500;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        transition: all 0.3s;
+        border-radius: 5px;
+    }
+
+    .sidebar .nav-link i {
+        margin-right: 10px;
+    }
+
+    .sidebar .nav-link:hover {
+        background-color: #ffbf00;
+        color: #000;
+    }
+
+    /* 🌟 Contenu principal */
+    .main-content {
+        margin-left: 280px;
+        padding: 20px;
+    }
+
+
+
+    /* 🌟 Pied de page */
+    .footer {
+        background: #2626ac;
+        color: #260e52;
+        text-align: center;
+        padding: 15px 0;
+        width: 100%;
+        position: fixed;
+        bottom: 0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+
+<!-- 🌟 Pied de page -->
+<footer class="footer">
+    <div>
+        
+        <a href="https://www.facebook.com/biopharmdz/" class="text-white me-3" target="_blank"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.biopharmdz.com/" class="text-white me-3" target="_blank"><i class="fas fa-globe"></i></a>
+        <a href="https://fr.linkedin.com/company/biopharmdz" class="text-white" target="_blank"><i class="fab fa-linkedin"></i></a>
+    </div>
+</footer>
+{% endblock %}
