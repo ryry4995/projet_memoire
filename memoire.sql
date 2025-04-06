@@ -1,8 +1,6 @@
--- Create database and tables first
 CREATE DATABASE IF NOT EXISTS reactif;
 USE reactif;
 
--- Create article table first as it's referenced by demande_achat
 CREATE TABLE IF NOT EXISTS article (
     id_article INT AUTO_INCREMENT PRIMARY KEY,
     code_article VARCHAR(50) NOT NULL,
@@ -13,7 +11,6 @@ CREATE TABLE IF NOT EXISTS article (
     quantite_unitaire INT DEFAULT 0
 );
 
--- Create stock table
 CREATE TABLE IF NOT EXISTS stock (
     id_stock INT AUTO_INCREMENT PRIMARY KEY,
     id_article INT NOT NULL,
@@ -21,7 +18,6 @@ CREATE TABLE IF NOT EXISTS stock (
     FOREIGN KEY (id_article) REFERENCES article(id_article)
 );
 
--- Create demande_achat table before referencing it
 CREATE TABLE IF NOT EXISTS demande_achat (
     id_demande INT AUTO_INCREMENT PRIMARY KEY,
     id_article INT NOT NULL,
@@ -32,7 +28,6 @@ CREATE TABLE IF NOT EXISTS demande_achat (
     FOREIGN KEY (id_article) REFERENCES article(id_article)
 );
 
--- Set default value for date_demande
 ALTER TABLE demande_achat
 MODIFY COLUMN date_demande DATE DEFAULT (CURRENT_DATE);
 
@@ -61,7 +56,6 @@ CREATE TABLE commande_demande (
     FOREIGN KEY (demande_id) REFERENCES demande_achat(id_demande) ON DELETE CASCADE
 );
 
--- Create reception table
 DROP TABLE IF EXISTS reception;
 CREATE TABLE reception (
     id_reception INT AUTO_INCREMENT PRIMARY KEY,
@@ -80,7 +74,6 @@ CREATE TABLE reception (
 
 ALTER TABLE reception ADD COLUMN quantite_unitaire INT DEFAULT 0;
 
--- Create first trigger separately
 DROP TRIGGER IF EXISTS insert_commande_achat;
 
 DELIMITER $$
@@ -99,7 +92,6 @@ BEGIN
 END $$
 DELIMITER ;
 
--- Create second trigger separately
 DROP TRIGGER IF EXISTS after_commande_validated;
 
 DELIMITER $$
@@ -137,22 +129,17 @@ BEGIN
 END $$
 DELIMITER ;
 
--- Drop other triggers if needed
 DROP TRIGGER IF EXISTS update_reception_quantite;
 DROP TRIGGER IF EXISTS update_stock_after_update;
 
--- Enable updates
 SET SQL_SAFE_UPDATES = 0;
 
--- Update reception table
 UPDATE reception r
 JOIN commande_achat c ON r.id_commande = c.id_commande
 SET r.quantite_unitaire = c.quantite_unitaire;
 
--- Update reception from article
 UPDATE reception r
 JOIN article a ON r.id_article = a.id_article
 SET r.quantite_unitaire = a.quantite_unitaire;
 
--- Final schema modifications
 ALTER TABLE reception MODIFY statut ENUM('Non réceptionné', 'Réceptionné') NOT NULL;
