@@ -1,0 +1,38 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django migrations
+*/migrations/*
+!*/migrations/__init__.py
+
+# Django local settings
+local_settings.py
+
+# SQLite database
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# IDE files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Log files
+*.log
+
+# Media and static files (uncomment if needed)
+# media/
+# static/
+
+# Environment variables
+.env
+.env.*
