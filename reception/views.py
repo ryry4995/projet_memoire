@@ -49,12 +49,8 @@ def modifier_quantite_reception(request, reception_id):
 
 
 
-
 def change_statut_reception(request, pk, statut):
     try:
-        # Décoder l'URL pour éviter des problèmes avec les caractères spéciaux
-        statut = unquote(statut)
-        
         reception = get_object_or_404(Reception, pk=pk)
 
         if reception.quantite_receptionnee is None:
@@ -64,34 +60,36 @@ def change_statut_reception(request, pk, statut):
         reception.save()
 
         if statut == "Réceptionné":
-            nouvelle_quantite = reception.quantite_receptionnee
-
-            if nouvelle_quantite <= 0:
-                return JsonResponse({"success": False, "error": "Quantité réceptionnée invalide"}, status=400)
-
-            quantite_unitaire = reception.quantite_unitaire
-            if quantite_unitaire is None or quantite_unitaire <= 0:
-                return JsonResponse({"success": False, "error": "Quantité unitaire invalide"}, status=400)
-
-            # Calculer le stock total en prenant en compte toutes les réceptions précédentes
+            # 🔁 Recalcule le stock total pour TOUTES les réceptions de ce code_article
             receptions = Reception.objects.filter(code_article=reception.code_article, statut="Réceptionné")
+
             stock_total_ajoute = sum(
                 r.quantite_receptionnee * r.quantite_unitaire
                 for r in receptions
                 if r.quantite_receptionnee and r.quantite_unitaire
             )
 
-            # Récupérer ou créer le stock
-            stock, created = Stock.objects.get_or_create(code_article=reception.code_article)
+            # Met à jour ou crée le stock
+            stock, created = Stock.objects.get_or_create(
+                code_article=reception.code_article,
+                defaults={
+                    "designation": reception.designation,
+                    "unite": reception.unite,
+                    "quantite_demandee": 0,
+                    "stock_consomer": 0,
+                    "stock_total": stock_total_ajoute,
+                    "id_reception": reception,
+                },
+            )
 
-            # Mettre à jour le stock total en fonction des réceptions
-            stock.stock_total = stock_total_ajoute
-            stock.save()
+            if not created:
+                stock.stock_total = stock_total_ajoute
+                stock.save()
 
-            print("✅ Stock mis à jour avec succès.")
-            return redirect('stock:stock_list')
+            print("✅ Stock mis à jour (recalcul global).")
+            return redirect("stock:stock_list")
 
-        return redirect('reception:reception_list')
+        return redirect("reception:reception_list")
 
     except Exception as e:
         print(f"❌ Erreur: {str(e)}")
