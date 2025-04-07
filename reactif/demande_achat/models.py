@@ -1,11 +1,5 @@
 # This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
-from django.db import models # type: ignore
+from django.db import models
 
 
 class Article(models.Model):
@@ -105,9 +99,6 @@ class AuthentificationArticle(models.Model):
         db_table = 'authentification_article'
 
 
-
-
-
 class DemandeAchat(models.Model):
     STATUT_CHOICES = [
         ('en_attente', 'En attente'),
@@ -134,6 +125,35 @@ class DemandeAchat(models.Model):
         if self.prix and self.quantite_demandee:  # Vérifier que les deux valeurs sont définies
             self.prix_total = self.quantite_demandee * self.prix
         super().save(*args, **kwargs)
+        
+    def create_commande(self):
+        # Import CommandeAchat et CommandeDemande à l'intérieur de la méthode pour éviter les imports circulaires
+        from commande_achat.models import CommandeAchat, CommandeDemande
+        import datetime
+        
+        # Vérifier si la demande est approuvée
+        if self.statut != 'approuve':
+            return None
+            
+        # Vérifier si la demande est déjà associée à une commande
+        try:
+            commande_demande = CommandeDemande.objects.get(demande=self)
+            # Si une commande existe déjà, on retourne cette commande
+            return commande_demande.commande
+        except CommandeDemande.DoesNotExist:
+            # Créer une nouvelle commande d'achat
+            commande = CommandeAchat.objects.create(
+                date_commande=datetime.date.today(),
+                statut='en_cours',
+                montant_total=self.prix_total,
+                fournisseur='À déterminer',  # À mettre à jour plus tard
+                remarques=f"Commande créée à partir de la demande #{self.id_demande}"
+            )
+            
+            # Créer l'association entre la commande et la demande
+            CommandeDemande.objects.create(commande=commande, demande=self)
+            
+            return commande
 
 
 class DjangoAdminLog(models.Model):
